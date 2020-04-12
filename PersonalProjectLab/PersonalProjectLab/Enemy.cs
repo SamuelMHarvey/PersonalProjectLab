@@ -46,8 +46,7 @@ namespace PersonalProjectLab
         public void EnemyTakesDamage(int damage)
         {
             _enemyHealth -= damage;
-            Console.WriteLine("Your attack hits!");
-            Console.WriteLine("The " + _enemyName + " takes " + damage + " damage.");
+            Console.WriteLine("Your attack hits the " + _enemyName + " for " + damage + " damage.");
         }
 
         public bool EnemyGivesMercy()

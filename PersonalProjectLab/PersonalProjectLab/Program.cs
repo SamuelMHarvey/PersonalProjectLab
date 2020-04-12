@@ -54,7 +54,7 @@ namespace PersonalProjectLab
                     switch (response)
                     {
                         case "attack":
-                            Console.WriteLine("{0}You attack the " + Enemy.EnemyName() + ".", Environment.NewLine);
+                            Console.WriteLine("{0}You attack the " + Enemy.EnemyName() + ".{0}", Environment.NewLine);
 
                             if (AttackHit(Player.PlayerArmorClass()))
                             {
@@ -62,7 +62,7 @@ namespace PersonalProjectLab
 
                                 if (Enemy.EnemyHealth() <= 0)
                                 {
-                                    Console.WriteLine("The " + Enemy.EnemyName() + " dies!");
+                                    Console.WriteLine("The " + Enemy.EnemyName() + " dies!{0}", Environment.NewLine);
                                     goto EmptyHallway;
                                 }
                                 
@@ -70,7 +70,7 @@ namespace PersonalProjectLab
                             }
                             else
                             {
-                                Console.WriteLine("Your attack misses.");
+                                Console.WriteLine("Your attack misses. {0}", Environment.NewLine);
                             }
                             break;
 
@@ -89,12 +89,12 @@ namespace PersonalProjectLab
                         case "surrender":
                             if (Enemy.EnemyGivesMercy())
                             {
-                                Console.WriteLine("The " + Enemy.EnemyName() + " decides to let you go. He walks back into the darkness.");
+                                Console.WriteLine("The " + Enemy.EnemyName() + " decides to let you go. He walks back into the darkness.{0}", Environment.NewLine);
                                 goto EmptyHallway;
                             }
                             else
                             {
-                                Console.WriteLine("Unfortunately, " + Enemy.EnemyName() + "s do not understand surrender. The " + Enemy.EnemyName() + " charges you.");
+                                Console.WriteLine("{0}Unfortunately, " + Enemy.EnemyName() + "s do not understand surrender. The " + Enemy.EnemyName() + " charges you.", Environment.NewLine);
                             }
                             
                             break;
@@ -104,17 +104,32 @@ namespace PersonalProjectLab
                             break;
                     }
 
+                    Console.WriteLine("The " + Enemy.EnemyName() + " attacks you.{0}", Environment.NewLine);
 
+                    if (AttackHit(Player.PlayerArmorClass()))
+                    {
+                        Player.PlayerTakesDamage(Enemy.EnemyAttack());
+                    }
+                    else
+                    {
+                        Console.WriteLine("The " + Enemy.EnemyName() + "'s attack misses you.");
+                    }
 
                 }
 
             EmptyHallway:
                 Console.WriteLine("You now stand alone in the dark hallway. {0}Would you like to continue? Type yes or no.", Environment.NewLine);
 
-                string keepGoing = Console.ReadLine();
+                string keepGoing = Console.ReadLine().ToLower();
                 if (keepGoing == "yes")
                 {
 
+                }
+                else
+                {
+                    Console.WriteLine("You leave the dark hallway. Your adventure ends.");
+                    Console.WriteLine("Press any key to exit.");
+                    Environment.Exit(0);
                 }
             }
 

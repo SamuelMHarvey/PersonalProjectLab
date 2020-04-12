@@ -43,8 +43,7 @@ namespace PersonalProjectLab
         public void PlayerTakesDamage(int damage)
         {
             _playerHealth -= damage;
-            Console.WriteLine("The attack hits!");
-            Console.WriteLine("You take " + damage + " damage!");
+            Console.WriteLine("The attack hits for " + damage + " damage.");
         }
     }
 }
