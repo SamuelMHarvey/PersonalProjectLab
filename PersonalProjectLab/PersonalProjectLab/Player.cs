@@ -4,24 +4,30 @@ using System.Text;
 
 namespace PersonalProjectLab
 {
-    class Player
+    public class Player
     {
         int _playerHealth;
+        int _maxPlayerHealth;
         int _armorClass;
         int _playerWeaponDamage;
-        string _playerName;
+        bool _isPlayerAlive = true;
 
-        public Player(int playerHealth, int armorClass, int playerWeaponDamage, string playerName)
+        public Player(int playerHealth, int armorClass, int playerWeaponDamage)
         {
+            _maxPlayerHealth = playerHealth;
             _playerHealth = playerHealth;
             _armorClass = armorClass;
             _playerWeaponDamage = playerWeaponDamage;
-            _playerName = playerName;
         }
 
         public int PlayerHealth()
         {
             return _playerHealth;
+        }
+
+        public void FillPlayerHealth()
+        {
+            _playerHealth = _maxPlayerHealth;
         }
 
         public int PlayerAttack()
@@ -44,6 +50,16 @@ namespace PersonalProjectLab
         {
             _playerHealth -= damage;
             Console.WriteLine("The attack hits for " + damage + " damage.");
+
+            if (_playerHealth <= 0)
+            {
+                _isPlayerAlive = false;
+            }
+        }
+
+        public bool IsPlayerAlive()
+        {
+            return _isPlayerAlive;
         }
     }
 }

@@ -4,37 +4,47 @@ using System.Threading;
 
 namespace PersonalProjectLab
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
-            Random random = new Random();
+            Engine Engine = new Engine();
 
             var playerStart = NewPlayer();
 
-            Player Player = new Player(playerStart.health, playerStart.armorClass, playerStart.weaponDamage, playerStart.playerName);
+            Player Player = new Player(playerStart.health, playerStart.armorClass, playerStart.weaponDamage);
 
-            // Keep going while player is alive
-            while (Player.PlayerHealth() > 0)
+            Console.WriteLine("Welcome to the game! You are playing as an adventurer exploring an abandoned house in the woods.");
+            // Keep going while player is alive and wanting to play
+            bool keepGoing = true;
+            while (keepGoing)
             {
-                Enemy Enemy = new Enemy(RandomNumber(5, 15), RandomNumber(8, 12), NewEnemyName());
-                
-                Console.WriteLine("You are walking down a dark hallway.{0}", Environment.NewLine);
+                Start:
+                Player.FillPlayerHealth();
 
-                Console.WriteLine("Suddenly, you see a " + Enemy.EnemyName() + " appear out of the darkness.");
+                Enemy Enemy = new Enemy(Engine.RandomNumber(5, 15), Engine.RandomNumber(8, 12), Engine.NewEnemyName());
+
+                Console.WriteLine("You start to explore your surroundings.");
+                Console.WriteLine("{0}You find yourself walking down a dark hallway.", Environment.NewLine);
+
+                Thread.Sleep(1000);
+
+                Console.WriteLine("{0}Suddenly, you see a " + Enemy.EnemyName() + " appear out of the darkness.", Environment.NewLine);
+
+                Thread.Sleep(500);
 
                 // Does the enemy get a surprise attack?
-                if (RandomNumber(1, 20) > 15)
+                if (Engine.RandomNumber(1, 20) > 15)
                 {
-                    Console.WriteLine("The " + Enemy.EnemyName() + " surprises you and attacks!");
+                    Console.WriteLine("{0}The " + Enemy.EnemyName() + " surprises you and attacks!", Environment.NewLine);
 
-                    if (AttackHit(Player.PlayerArmorClass()))
+                    if (Engine.AttackHit(Player.PlayerArmorClass()))
                     {
-                      Player.PlayerTakesDamage(Enemy.EnemyAttack());
+                        Player.PlayerTakesDamage(Enemy.EnemyAttack());
                     }
                     else
                     {
-                        Console.WriteLine("The attack barely misses!");
+                        Console.WriteLine("{0}The attack barely misses!", Environment.NewLine);
                     }
                 }
                 else
@@ -43,8 +53,9 @@ namespace PersonalProjectLab
                 }
 
                 // Keep going while enemy is alive
-                while (Enemy.EnemyHealth() > 0)
+                while ((Enemy.EnemyHealth() > 0) & (Player.IsPlayerAlive()))
                 {
+                    Thread.Sleep(1000);
                     Console.WriteLine("{0}What would you like to do?", Environment.NewLine);
                     Console.WriteLine("(Attack, run, or surrender)");
 
@@ -54,59 +65,53 @@ namespace PersonalProjectLab
                     switch (response)
                     {
                         case "attack":
-                            Console.WriteLine("{0}You attack the " + Enemy.EnemyName() + ".{0}", Environment.NewLine);
+                            Console.WriteLine("{0}You attack the " + Enemy.EnemyName() + ".", Environment.NewLine);
 
-                            if (AttackHit(Player.PlayerArmorClass()))
+                            if (Engine.AttackHit(Player.PlayerArmorClass()))
                             {
                                 Enemy.EnemyTakesDamage(Player.PlayerAttack());
-
-                                if (Enemy.EnemyHealth() <= 0)
-                                {
-                                    Console.WriteLine("The " + Enemy.EnemyName() + " dies!{0}", Environment.NewLine);
-                                    goto EmptyHallway;
-                                }
-                                
-                               
                             }
                             else
                             {
-                                Console.WriteLine("Your attack misses. {0}", Environment.NewLine);
+                                Console.WriteLine("Your attack misses.");
                             }
                             break;
 
                         case "run":
-                            if (RandomNumber(1, 20) >= 8)
+                            if (Engine.RandomNumber(1, 20) >= 8)
                             {
-                                Console.WriteLine("You successfully run away, leaving the " + Enemy.EnemyName() + " far in the distance.");
-                                goto EmptyHallway;
+                                Console.WriteLine("{0}You successfully run away, leaving the " + Enemy.EnemyName() + " far in the distance.", Environment.NewLine);
+                                goto Start;
                             }
                             else
                             {
-                                Console.WriteLine("You try to run, but the " + Enemy.EnemyName() + " quickly catches up to you.");
+                                Console.WriteLine("{0}You try to run, but the " + Enemy.EnemyName() + " quickly catches up to you.", Environment.NewLine);
                             }
                             break;
 
                         case "surrender":
                             if (Enemy.EnemyGivesMercy())
                             {
-                                Console.WriteLine("The " + Enemy.EnemyName() + " decides to let you go. He walks back into the darkness.{0}", Environment.NewLine);
-                                goto EmptyHallway;
+                                Console.WriteLine("{0}The " + Enemy.EnemyName() + " decides to let you go. He walks back into the darkness.", Environment.NewLine);
+                                goto Start;
                             }
                             else
                             {
-                                Console.WriteLine("{0}Unfortunately, " + Enemy.EnemyName() + "s do not understand surrender. The " + Enemy.EnemyName() + " charges you.", Environment.NewLine);
+                                Console.WriteLine("{0}Unfortunately, " + Enemy.EnemyName() + "s do not understand surrender.", Environment.NewLine);
                             }
-                            
+
                             break;
 
                         default:
                             Console.WriteLine("{0}That is not a valid action.", Environment.NewLine);
-                            break;
+                            continue;
                     }
 
-                    Console.WriteLine("The " + Enemy.EnemyName() + " attacks you.{0}", Environment.NewLine);
+                    Thread.Sleep(1000);
 
-                    if (AttackHit(Player.PlayerArmorClass()))
+                    Console.WriteLine("{0}The " + Enemy.EnemyName() + " attacks you.", Environment.NewLine);
+
+                    if (Engine.AttackHit(Player.PlayerArmorClass()))
                     {
                         Player.PlayerTakesDamage(Enemy.EnemyAttack());
                     }
@@ -117,56 +122,37 @@ namespace PersonalProjectLab
 
                 }
 
-            EmptyHallway:
-                Console.WriteLine("You now stand alone in the dark hallway. {0}Would you like to continue? Type yes or no.", Environment.NewLine);
 
-                string keepGoing = Console.ReadLine().ToLower();
-                if (keepGoing == "yes")
+                if (Player.IsPlayerAlive() == false)
                 {
-
+                    keepGoing = Engine.EndOfEncounter(true, Enemy.EnemyName());
                 }
                 else
                 {
-                    Console.WriteLine("You leave the dark hallway. Your adventure ends.");
-                    Console.WriteLine("Press any key to exit.");
-                    Environment.Exit(0);
+                    Thread.Sleep(1000);
+
+                    Console.WriteLine("{0}After the " + Enemy.EnemyName() + " makes its desperate final attack, it succumbs to its injuries. You have killed the " + Enemy.EnemyName() + ".", Environment.NewLine);
+                    
+                    keepGoing = Engine.EndOfEncounter(false, Enemy.EnemyName());
                 }
-            }
-
-            int RandomNumber(int min, int max)
-            {
-                return random.Next(min, max);
-            }
-
-            (int health, int armorClass, int weaponDamage, string playerName) NewPlayer()
-            {
-                int playerHealth = 20;
-                int playerArmorClass = 15;
-                int playerWeaponDamage = 4;
-                string playerName = "Player";
-
-                return (playerHealth, playerArmorClass, playerWeaponDamage, playerName);
             }
             
-            string NewEnemyName()
             {
-                var enemyTypeList = new List<string> { "zombie", "wild bear", "skeleton", "goblin" };
-                int index = random.Next(enemyTypeList.Count);
-
-                return enemyTypeList[index];
+                Console.WriteLine("You leave the dark hallway. Your adventure ends.");
+                Console.WriteLine("Press any key to exit.");
+                Environment.Exit(0);
             }
 
-            bool AttackHit(int armorClass)
+            (int health, int armorClass, int weaponDamage) NewPlayer()
             {
-                if(RandomNumber(8, 20) >= armorClass)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                int playerHealth = 15;
+                int playerArmorClass = 14;
+                int playerWeaponDamage = 4;
+
+                return (playerHealth, playerArmorClass, playerWeaponDamage);
             }
+            
+ 
         }
     }
 }

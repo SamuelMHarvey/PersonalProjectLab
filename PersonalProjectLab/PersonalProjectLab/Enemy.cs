@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PersonalProjectLab
 {
-    class Enemy
+    public class Enemy
     {
         int _enemyHealth;
         int _armorClass;
